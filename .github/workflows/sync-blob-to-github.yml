@@ -22,8 +22,8 @@ jobs:
           az storage blob download \
             --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT }} \
             --account-key ${{ secrets.AZURE_STORAGE_KEY }} \
-            --container-name projectnetflix1 \
-            --name bronze/NetflixCast.csv \
+            --container-name bronze \
+            --name NetflixCast.csv \
             --file data/NetflixCast.csv
 
       - name: Commit to GitHub
