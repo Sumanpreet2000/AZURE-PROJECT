@@ -1,0 +1,35 @@
+name: Copy from ADLS Gen2 to GitHub
+
+on:
+  workflow_dispatch:  # Manual trigger
+  schedule:
+    - cron: '0 1 * * *'  # Runs daily at 1 AM UTC
+
+jobs:
+  fetch-from-adls:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Install Azure CLI
+        run: |
+          curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+
+      - name: Download file from ADLS Gen2
+        run: |
+          az storage blob download \
+            --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT }} \
+            --account-key ${{ secrets.AZURE_STORAGE_KEY }} \
+            --container-name projectnetflix1 \
+            --name bronze/NetflixCast.csv \
+            --file data/NetflixCast.csv
+
+      - name: Commit to GitHub
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add data/NetflixCast.csv
+          git commit -m "Sync NetflixCast.csv from ADLS Gen2"
+          git push
