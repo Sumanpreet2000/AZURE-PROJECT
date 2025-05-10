@@ -23,8 +23,8 @@ jobs:
           az storage blob download \
             --account-name projectnetflix1 \
             --container-name bronze \
-            --name NetflixCast \
-            --file data/NetflixCast \
+            --name NetflixCategories \
+            --file data/NetflixCategories \
             --sas-token "${{ secrets.AZURE_SAS_TOKEN }}"
 
       - name: Commit and Push to GitHub
@@ -33,7 +33,7 @@ jobs:
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
-          git add data/NetflixCast
-          git commit -m "Sync NetflixCast from ADLS Gen2"
+          git add data/NetflixCategories
+          git commit -m "Sync NetflixCategories from ADLS Gen2"
           git remote set-url origin https://x-access-token:${TOKEN}@github.com/${{ github.repository }}
           git push origin HEAD:main
