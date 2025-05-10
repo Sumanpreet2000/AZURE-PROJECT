@@ -1,38 +1,39 @@
 name: Sync NetflixCast from ADLS Gen2 to GitHub
 
 on:
-  workflow_dispatch:  # You can also use schedule or push
+  workflow_dispatch:
 
 permissions:
-  contents: write  # 👈 Required to allow git push from Actions
+  contents: write  
 
 jobs:
-  sync-file:
+  download-and-commit:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repo
-      uses: actions/checkout@v3
+      - name: Checkout repo
+        uses: actions/checkout@v3
 
-    - name: Install Azure CLI
-      uses: azure/setup-azurecli@v1
+      - name: Install Azure CLI
+        uses: azure/setup-azurecli@v1
 
-    - name: Download NetflixCast.csv from Azure Blob
-      run: |
-        az storage blob download \
-          --account-name projectnetflix1 \
-          --container-name bronze \
-          --name NetflixCast \
-          --file data/NetflixCast \
-          --sas-token "${{ secrets.AZURE_SAS_TOKEN }}"
+      - name: Download file from ADLS Gen2
+        run: |
+          az storage blob download \
+            --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT }} \
+            --account-key ${{ secrets.AZURE_STORAGE_KEY }} \
+            --container-name bronze \
+            --name NetflixCast \
+            --file data/NetflixCast \
+            --sas-token "${{ secrets.AZURE_SAS_TOKEN }}"
 
-    - name: Commit and Push to GitHub
-      env:
-        TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        git config --global user.name "GitHub Actions"
-        git config --global user.email "actions@github.com"
-        git add data/NetflixCast
-        git commit -m "Sync NetflixCast from ADLS Gen2"
-        git remote set-url origin https://x-access-token:${TOKEN}@github.com/${{ github.repository }}
-        git push origin HEAD:main
+      - name: Commit and Push to GitHub
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add data/NetflixCast
+          git commit -m "Sync NetflixCast from ADLS Gen2"
+          git remote set-url origin https://x-access-token:${TOKEN}@github.com/${{ github.repository }}
+          git push origin HEAD:main
