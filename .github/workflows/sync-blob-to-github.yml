@@ -14,14 +14,14 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Install Azure CLI
-        uses: azure/setup-cli@v1
+      - name: Install Azure CLI manually
+        run: |
+          curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
-      - name: Download file from ADLS Gen2
+      - name: Download NetflixCast.csv from Azure Blob
         run: |
           az storage blob download \
-            --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT }} \
-            --account-key ${{ secrets.AZURE_STORAGE_KEY }} \
+            --account-name projectnetflix1 \
             --container-name bronze \
             --name NetflixCast \
             --file data/NetflixCast \
